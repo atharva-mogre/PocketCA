@@ -110,7 +110,18 @@ export default function Dashboard() {
   ];
 
   const remainingFlexible = budget.remainingFlexible || (budget.income - totalFixed);
-  const isOverBudget = flexibleSpent > (remainingFlexible + totalCredits - budget.allocations.savings);
+  const flexibleAvailable = remainingFlexible + totalCredits;
+  const isOverBudget = flexibleSpent > (flexibleAvailable - budget.allocations.savings);
+
+  const today = new Date();
+  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const remainingDays = endOfMonth.getDate() - today.getDate();
+  const daysPassed = today.getDate();
+  const totalDays = endOfMonth.getDate();
+  const percentMonthPassed = daysPassed / totalDays;
+  
+  const percentSpent = flexibleAvailable > 0 ? (flexibleSpent / flexibleAvailable) : 0;
+  const isHighBrokeRisk = percentSpent > (percentMonthPassed + 0.15);
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
@@ -150,24 +161,44 @@ export default function Dashboard() {
                 <Plus className="w-5 h-5 text-primary" /> Log Entry
               </h2>
               <div className="flex bg-slate-100 p-1 rounded-lg">
-                <button type="button" onClick={() => setTxType('expense')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${txType === 'expense' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Expense</button>
-                <button type="button" onClick={() => setTxType('credit')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${txType === 'credit' ? 'bg-white shadow-sm text-green-600' : 'text-slate-500 hover:text-slate-700'}`}>Credit / Income</button>
+                <button type="button" onClick={() => setTxType('expense')} className={`px-4 py-1.5 min-h-[48px] rounded-md text-sm font-medium transition-colors ${txType === 'expense' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Expense</button>
+                <button type="button" onClick={() => setTxType('credit')} className={`px-4 py-1.5 min-h-[48px] rounded-md text-sm font-medium transition-colors ${txType === 'credit' ? 'bg-white shadow-sm text-green-600' : 'text-slate-500 hover:text-slate-700'}`}>Credit / Income</button>
               </div>
             </div>
+            {txType === 'expense' && (
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-2 no-scrollbar">
+                {[
+                  { val: 'Food', label: '🍔 Food' },
+                  { val: 'Shopping', label: '🛍️ Shopping' },
+                  { val: 'Travel', label: '🚌 Travel' },
+                  ...(hasFixed ? [{ val: 'Fixed', label: '💸 Fixed' }] : []),
+                  { val: 'Other', label: '✨ Other' }
+                ].map(cat => (
+                  <button
+                    key={cat.val}
+                    type="button"
+                    onClick={() => setTxCategory(cat.val as any)}
+                    className={`px-4 py-2 min-h-[48px] rounded-full whitespace-nowrap text-sm font-medium transition-colors border ${txCategory === cat.val ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            )}
             <form onSubmit={handleAddTx} className="flex flex-wrap gap-4">
               <input 
                 type="number" 
                 placeholder="Amount (₹)" 
                 value={txAmount}
                 onChange={(e) => setTxAmount(e.target.value)}
-                className="flex-1 min-w-[120px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary"
+                className="flex-1 min-w-[120px] px-4 py-3 min-h-[48px] border border-slate-200 rounded-lg outline-none focus:border-primary"
                 required
               />
               {txType === 'expense' && (
                 <select 
                   value={txCategory}
                   onChange={(e) => setTxCategory(e.target.value as any)}
-                  className="flex-1 min-w-[140px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary bg-white"
+                  className="flex-1 min-w-[140px] px-4 py-3 min-h-[48px] border border-slate-200 rounded-lg outline-none focus:border-primary bg-white"
                 >
                   <option value="Food">Food & Drinks</option>
                   <option value="Shopping">Shopping & Ent.</option>
@@ -181,9 +212,9 @@ export default function Dashboard() {
                 placeholder="Description (optional)" 
                 value={txDesc}
                 onChange={(e) => setTxDesc(e.target.value)}
-                className="flex-2 min-w-[200px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary"
+                className="flex-2 min-w-[200px] px-4 py-3 min-h-[48px] border border-slate-200 rounded-lg outline-none focus:border-primary"
               />
-              <button type="submit" className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition-colors min-w-[80px]">
+              <button type="submit" className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 min-h-[48px] rounded-lg font-medium transition-colors min-w-[80px]">
                 Add
               </button>
             </form>
@@ -255,15 +286,55 @@ export default function Dashboard() {
         {/* Right Column: AI Reality Check */}
         <div className="space-y-8">
           
-          <div className={`text-white p-6 rounded-2xl shadow-lg relative overflow-hidden transition-colors ${dynamicSavings < 0 ? 'bg-red-600' : 'bg-primary'}`}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-            <h2 className="text-lg font-semibold mb-2 opacity-90">Savings Target</h2>
-            <div className={`text-4xl font-bold mb-1 ${dynamicSavings < 0 ? 'text-white' : 'text-secondary'}`}>
+          <div className="bg-slate-900 p-6 rounded-2xl shadow-lg relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/20 rounded-full blur-2xl"></div>
+            <h2 className="text-lg font-semibold text-white mb-2 relative z-10">Savings Target</h2>
+            <div className={`text-4xl font-bold mb-1 ${dynamicSavings >= budget.allocations.savings ? 'text-primary' : 'text-red-400'} relative z-10`}>
               ₹{dynamicSavings.toFixed(2)}
             </div>
-            <div className="text-sm text-white/80">
-              {dynamicSavings < 0 ? 'Warning: You have overspent your available funds!' : `Your initial goal was ₹${budget.allocations.savings.toFixed(2)}`}
+            <p className="text-slate-400 text-sm relative z-10">Your initial goal was ₹{budget.allocations.savings.toFixed(2)}</p>
+            
+            <div className="mt-6 relative z-10">
+              <div className="flex justify-between text-xs text-slate-400 mb-2">
+                <span>Progress</span>
+                <span>{Math.max(0, Math.min(100, (dynamicSavings / budget.allocations.savings) * 100)).toFixed(0)}%</span>
+              </div>
+              <div className="w-full bg-slate-800 rounded-full h-2">
+                <div 
+                  className={`h-2 rounded-full ${dynamicSavings >= budget.allocations.savings ? 'bg-primary' : 'bg-red-400'}`} 
+                  style={{ width: `${Math.max(0, Math.min(100, (dynamicSavings / budget.allocations.savings) * 100))}%` }}
+                ></div>
+              </div>
             </div>
+          </div>
+
+          {/* Broke Meter */}
+          <div className={`p-6 rounded-2xl border ${isHighBrokeRisk ? 'bg-red-50 border-red-200' : 'bg-white border-slate-100'} shadow-sm transition-colors`}>
+             <div className="flex justify-between items-start mb-4">
+               <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                 Broke Meter
+               </h3>
+               {isHighBrokeRisk && <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">⚠️ High Risk</span>}
+             </div>
+             <div className="space-y-3">
+               <div className="flex justify-between text-sm">
+                 <span className="text-slate-500">Month Passed</span>
+                 <span className="font-medium">{Math.round(percentMonthPassed * 100)}% ({remainingDays} days left)</span>
+               </div>
+               <div className="flex justify-between text-sm">
+                 <span className="text-slate-500">Flexible Budget Spent</span>
+                 <span className={`font-medium ${isHighBrokeRisk ? 'text-red-600' : 'text-slate-700'}`}>{Math.round(percentSpent * 100)}%</span>
+               </div>
+             </div>
+             {isHighBrokeRisk ? (
+               <p className="mt-4 text-sm text-red-600 leading-relaxed bg-red-100/50 p-3 rounded-lg font-medium">
+                 You are burning through cash faster than the days are passing! Slow down or you'll be eating instant noodles next week.
+               </p>
+             ) : (
+               <p className="mt-4 text-sm text-emerald-600 leading-relaxed bg-emerald-50 p-3 rounded-lg font-medium">
+                 You are pacing your spending perfectly. Keep it up!
+               </p>
+             )}
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
@@ -289,13 +360,7 @@ export default function Dashboard() {
             </div>
 
             <div className={`p-4 rounded-xl ${isOverBudget ? 'bg-red-50 text-red-700 border-red-100' : 'bg-primary/5 text-primary-light border-primary/10'} border text-sm leading-relaxed`}>
-              <strong>AI Insight:</strong> {
-                isOverBudget 
-                ? "You are trending over your recommended budget limits. Watch your flexible spending to ensure you hit your savings target."
-                : (spent.Shopping > budget.allocations.shopping) 
-                  ? "You hit your savings goal perfectly, but you overspent on your Shopping budget. Watch out for impulse buys next month!" 
-                  : "Excellent pacing. You are well within the AI recommended limits across all categories. Your savings target is secure."
-              }
+              <strong>AI Analysis:</strong> {dynamicSavings >= budget.allocations.savings ? "You actually hit your savings target! The instant noodle diet paid off! Enjoy the extra cash." : isOverBudget ? "Oof. Over budget. Maybe skip the weekend impulse buys next time? Your wallet is crying." : "Not quite your savings target, but you survived. Let's try not to scrape by next month."}
             </div>
           </div>
 
@@ -336,13 +401,7 @@ export default function Dashboard() {
             </div>
 
             <div className={`mb-8 p-4 rounded-xl ${isOverBudget ? 'bg-red-50 text-red-700 border-red-100' : 'bg-primary/5 text-primary-light border-primary/10'} border text-sm leading-relaxed`}>
-              <strong>Final AI Insight:</strong> {
-                isOverBudget 
-                ? "You trended over your recommended budget limits this month. Let's aim to strictly monitor flexible spending in the next cycle."
-                : (spent.Shopping > budget.allocations.shopping) 
-                  ? "You hit your savings goal perfectly, but you overspent on Shopping. Watch out for impulse buys next month!" 
-                  : "Excellent pacing. You stayed well within the AI limits across all categories and secured your savings target."
-              }
+              <strong>AI Analysis:</strong> {dynamicSavings >= budget.allocations.savings ? "You actually hit your savings target! The instant noodle diet paid off! Enjoy the extra cash." : isOverBudget ? "Oof. Over budget. Maybe skip the weekend impulse buys next time? Your wallet is crying." : "Not quite your savings target, but you survived. Let's try not to scrape by next month."}
             </div>
 
             <button 

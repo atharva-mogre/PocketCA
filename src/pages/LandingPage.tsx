@@ -10,7 +10,7 @@ const LandingPage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-6 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[85vh]">
         
         {/* Left Column (Content) */}
-        <div className="flex flex-col justify-center space-y-10 order-2 lg:order-1">
+        <div className="flex flex-col justify-center space-y-10">
           <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-[#0f172a] leading-[1.1] tracking-tighter">
             Make your pocket money last until <span className="text-[#10b981]">Month End.</span>
           </h1>
@@ -22,7 +22,7 @@ const LandingPage: React.FC = () => {
           <div>
             <Link
               to="/onboarding"
-              className="inline-flex items-center justify-center bg-[#0f172a] text-white px-10 py-5 rounded-full font-bold text-xl transition-all duration-300 ease-in-out hover:bg-[#10b981] shadow-xl hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:scale-105"
+              className="inline-flex items-center justify-center bg-[#0f172a] text-white min-h-[48px] px-10 py-5 rounded-full font-bold text-xl transition-all duration-300 ease-in-out hover:bg-[#10b981] shadow-xl hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:scale-105"
             >
               Plan My Month
             </Link>
@@ -30,7 +30,7 @@ const LandingPage: React.FC = () => {
         </div>
         
         {/* Right Column (Visual Anchor) */}
-        <div className="flex items-center justify-center order-1 lg:order-2">
+        <div className="flex items-center justify-center">
           <img
             src={customHeroImage}
             alt="PocketCA App Dashboard Logo"

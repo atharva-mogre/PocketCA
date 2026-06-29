@@ -138,7 +138,7 @@ export default function Onboarding() {
           ))}
         </div>
 
-        <div className="p-8 md:p-12 min-h-[400px]">
+        <div className="px-4 md:px-6 py-8 md:py-12 min-h-[400px]">
           {/* STEP 1: Input Form */}
           {step === 1 && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -155,7 +155,7 @@ export default function Onboarding() {
                     type="number" 
                     value={income}
                     onChange={(e) => setIncome(e.target.value)}
-                    className="w-full pl-8 pr-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                    className="w-full pl-8 pr-4 py-3 min-h-[48px] rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                     placeholder="e.g. 1000"
                   />
                 </div>
@@ -176,24 +176,24 @@ export default function Onboarding() {
                   </div>
                 ))}
 
-                <div className="flex gap-3">
+                <div className="flex flex-wrap sm:flex-nowrap gap-3">
                   <input 
                     type="text" 
                     value={newExpenseName}
                     onChange={(e) => setNewExpenseName(e.target.value)}
                     placeholder="Rent, Mess Bill, etc."
-                    className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                    className="flex-1 min-w-[150px] px-4 py-3 min-h-[48px] rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                   />
                   <input 
                     type="number" 
                     value={newExpenseAmount}
                     onChange={(e) => setNewExpenseAmount(e.target.value)}
                     placeholder="Amount"
-                    className="w-32 px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
+                    className="w-full sm:w-32 px-4 py-3 min-h-[48px] rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
                   />
                   <button 
                     onClick={handleAddFixedExpense}
-                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 p-3 rounded-xl transition-colors"
+                    className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 p-3 min-h-[48px] rounded-xl transition-colors flex items-center justify-center"
                   >
                     <Plus className="w-5 h-5" />
                   </button>
