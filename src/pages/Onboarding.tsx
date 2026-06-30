@@ -25,7 +25,14 @@ export default function Onboarding() {
   
   const { user, logOut } = useAuth();
   const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-  const { saveBudget } = useBudget(user?.id, currentMonth);
+  const { saveBudget, budget, loading: budgetLoading } = useBudget(user?.id, currentMonth);
+
+  // Smart Onboarding Bypass
+  useEffect(() => {
+    if (user && !budgetLoading && budget) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, budget, budgetLoading, navigate]);
 
   const handleAddFixedExpense = () => {
     if (newExpenseName && newExpenseAmount) {
