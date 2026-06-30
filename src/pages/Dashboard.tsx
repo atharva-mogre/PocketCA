@@ -18,7 +18,6 @@ export default function Dashboard() {
   
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [showFullInsight, setShowFullInsight] = useState(false);
   
   const [txType, setTxType] = useState<'expense' | 'credit'>('expense');
   const [txAmount, setTxAmount] = useState('');
@@ -114,11 +113,11 @@ export default function Dashboard() {
   const isOverBudget = flexibleSpent > (remainingFlexible + totalCredits - budget.allocations.savings);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 overflow-hidden">
+    <div className="main-container max-w-6xl mx-auto px-6 py-8 space-y-8">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Monthly Workspace</h1>
-          <p className="text-sm sm:text-base text-slate-500">Track your progress and stay on target.</p>
+          <h1 className="text-3xl font-bold text-slate-900">Monthly Workspace</h1>
+          <p className="text-slate-500">Track your progress and stay on target.</p>
         </div>
         <div className="flex gap-2">
           <button 
@@ -126,219 +125,180 @@ export default function Dashboard() {
               await logOut();
               navigate('/login');
             }}
-            className="flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 px-3 sm:px-4 py-2 font-medium transition-colors min-h-[48px] text-sm sm:text-base"
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-700 px-3 sm:px-4 py-2.5 font-medium transition-colors"
           >
-            <LogOut className="w-4 h-4 sm:w-5 sm:h-5" /> <span className="hidden sm:inline">Log Out</span>
+            <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Log Out</span>
           </button>
           <button 
             onClick={() => setShowSummaryModal(true)}
-            className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-medium transition-colors min-h-[48px] text-sm sm:text-base"
+            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-medium transition-colors"
           >
-            <Archive className="w-4 h-4 sm:w-5 sm:h-5" /> Close Logs
+            <Archive className="w-4 h-4" /> Close Logs
           </button>
         </div>
       </header>
 
-      <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
+      <div className="dashboard-grid grid lg:grid-cols-3 gap-8">
         
-        {/* Left Column: Ledger & Tracking & Savings Target */}
-        <div className="lg:col-span-2 flex flex-col gap-6 sm:gap-8">
+        {/* Left Column: Ledger & Tracking */}
+        <div className="lg:col-span-2 space-y-8">
           
-          {/* Combined Log Entry & Progress Bars */}
-          <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-6">
-            
-            {/* Quick Add */}
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-base sm:text-lg font-semibold text-slate-800 flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-primary" /> Log Entry
-                </h2>
-                <div className="flex bg-slate-100 p-1 rounded-lg">
-                  <button type="button" onClick={() => setTxType('expense')} className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors ${txType === 'expense' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Expense</button>
-                  <button type="button" onClick={() => setTxType('credit')} className={`px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-colors ${txType === 'credit' ? 'bg-white shadow-sm text-green-600' : 'text-slate-500 hover:text-slate-700'}`}>Income</button>
-                </div>
-              </div>
-              <form onSubmit={handleAddTx} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-                <input 
-                  type="number" 
-                  placeholder="Amount (₹)" 
-                  value={txAmount}
-                  onChange={(e) => setTxAmount(e.target.value)}
-                  className="w-full sm:w-auto flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary min-h-[48px]"
-                  required
-                />
-                {txType === 'expense' && (
-                  <select 
-                    value={txCategory}
-                    onChange={(e) => setTxCategory(e.target.value as any)}
-                    className="w-full sm:w-auto flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary bg-white min-h-[48px]"
-                  >
-                    <option value="Food">Food & Drinks</option>
-                    <option value="Shopping">Shopping & Ent.</option>
-                    <option value="Travel">Travel & Transit</option>
-                    {hasFixed && <option value="Fixed">Fixed Expense</option>}
-                    <option value="Other">Other / Misc</option>
-                  </select>
-                )}
-                <input 
-                  type="text" 
-                  placeholder="Description (optional)" 
-                  value={txDesc}
-                  onChange={(e) => setTxDesc(e.target.value)}
-                  className="w-full sm:w-auto sm:flex-2 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary min-h-[48px]"
-                />
-                <button type="submit" className="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition-colors min-h-[48px]">
-                  Add
-                </button>
-              </form>
-            </div>
-
-            <div className="border-t border-slate-100"></div>
-
-            {/* Progress Bars */}
-            <div className="space-y-5 sm:space-y-6">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-800 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-secondary" /> Active Budget Tracking
+          {/* Quick Add */}
+          <div className="log-entry-card bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-primary" /> Log Entry
               </h2>
-              
-              <CategoryProgress label="Food & Drinks" spent={spent.Food} allocated={budget.allocations.food} />
-              <CategoryProgress label="Shopping & Ent." spent={spent.Shopping} allocated={budget.allocations.shopping} />
-              <CategoryProgress label="Travel & Transit" spent={spent.Travel} allocated={budget.allocations.travel} />
-              <CategoryProgress label="Other / Misc" spent={spent.Other} allocated={budget.allocations.other} />
-              {hasFixed && <CategoryProgress label="Fixed Expenses" spent={spent.Fixed} allocated={totalFixed} />}
-              
-              <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-100">
-                <CategoryProgress label="Overall Budget Used" spent={effectiveTotalSpent} allocated={totalAvailable} isOverall={true} />
+              <div className="flex bg-slate-100 p-1 rounded-lg">
+                <button type="button" onClick={() => setTxType('expense')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${txType === 'expense' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>Expense</button>
+                <button type="button" onClick={() => setTxType('credit')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${txType === 'credit' ? 'bg-white shadow-sm text-green-600' : 'text-slate-500 hover:text-slate-700'}`}>Credit / Income</button>
               </div>
+            </div>
+            <form onSubmit={handleAddTx} className="flex flex-wrap gap-4">
+              <input 
+                type="number" 
+                placeholder="Amount (₹)" 
+                value={txAmount}
+                onChange={(e) => setTxAmount(e.target.value)}
+                className="w-full sm:w-auto flex-1 min-w-[120px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary"
+                required
+              />
+              {txType === 'expense' && (
+                <select 
+                  value={txCategory}
+                  onChange={(e) => setTxCategory(e.target.value as any)}
+                  className="w-full sm:w-auto flex-1 min-w-[140px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary bg-white"
+                >
+                  <option value="Food">Food & Drinks</option>
+                  <option value="Shopping">Shopping & Ent.</option>
+                  <option value="Travel">Travel & Transit</option>
+                  {hasFixed && <option value="Fixed">Fixed Expense</option>}
+                  <option value="Other">Other / Miscellaneous</option>
+                </select>
+              )}
+              <input 
+                type="text" 
+                placeholder="Description (optional)" 
+                value={txDesc}
+                onChange={(e) => setTxDesc(e.target.value)}
+                className="w-full sm:w-auto flex-2 min-w-[200px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary"
+              />
+              <button type="submit" className="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition-colors min-w-[80px]">
+                Add
+              </button>
+            </form>
+          </div>
+
+          {/* Progress Bars */}
+          <div className="budget-tracking-card bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-secondary" /> Active Budget Tracking
+            </h2>
+            
+            <CategoryProgress label="Food & Drinks" spent={spent.Food} allocated={budget.allocations.food} />
+            <CategoryProgress label="Shopping & Ent." spent={spent.Shopping} allocated={budget.allocations.shopping} />
+            <CategoryProgress label="Travel & Transit" spent={spent.Travel} allocated={budget.allocations.travel} />
+            <CategoryProgress label="Other / Misc" spent={spent.Other} allocated={budget.allocations.other} />
+            {hasFixed && <CategoryProgress label="Fixed Expenses" spent={spent.Fixed} allocated={totalFixed} />}
+            
+            <div className="mt-8 pt-6 border-t border-slate-100">
+              <CategoryProgress label="Overall Budget Used" spent={effectiveTotalSpent} allocated={totalAvailable} isOverall={true} />
             </div>
           </div>
 
-          {/* Repositioned Savings Target */}
-          <div className={`text-white p-6 rounded-2xl shadow-lg relative overflow-hidden transition-colors ${dynamicSavings < 0 ? 'bg-red-600' : 'bg-primary'}`}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-            <h2 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2 opacity-90">Savings Target</h2>
-            <div className={`text-3xl sm:text-4xl font-bold mb-1 ${dynamicSavings < 0 ? 'text-white' : 'text-secondary'}`}>
-              ₹{dynamicSavings.toFixed(2)}
-            </div>
-            <div className="text-xs sm:text-sm text-white/80">
-              {dynamicSavings < 0 ? 'Warning: You have overspent your available funds!' : `Your initial goal was ₹${budget.allocations.savings.toFixed(2)}`}
+          {/* Recent Transactions */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">Recent Logs</h2>
+            <div className="space-y-3">
+              {transactions.length === 0 ? (
+                <p className="text-sm text-slate-400 italic">No entries logged yet.</p>
+              ) : (
+                transactions.slice(0, 5).map(t => (
+                  <div key={t.id} className="flex justify-between items-center p-3 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100 group">
+                    {editingId === t.id ? (
+                      <div className="flex-1 flex gap-2 items-center">
+                        <input type="number" value={editAmount} onChange={e => setEditAmount(e.target.value)} className="w-20 px-2 py-1 border border-slate-200 rounded text-sm outline-none focus:border-primary" />
+                        <select value={editCategory} onChange={e => setEditCategory(e.target.value as any)} className="w-24 px-2 py-1 border border-slate-200 rounded text-sm bg-white outline-none focus:border-primary">
+                          <option value="Food">Food</option>
+                          <option value="Shopping">Shopping</option>
+                          <option value="Travel">Travel</option>
+                          {hasFixed && <option value="Fixed">Fixed</option>}
+                          <option value="Other">Other</option>
+                          <option value="Credit">Credit</option>
+                        </select>
+                        <input type="text" value={editDesc} onChange={e => setEditDesc(e.target.value)} className="flex-1 min-w-[80px] px-2 py-1 border border-slate-200 rounded text-sm outline-none focus:border-primary" />
+                        <button onClick={() => handleUpdateTx(t.id)} className="text-green-600 hover:text-green-700 p-1 bg-green-50 rounded"><Check className="w-4 h-4" /></button>
+                        <button onClick={() => setEditingId(null)} className="text-slate-400 hover:text-slate-600 p-1 bg-slate-100 rounded"><X className="w-4 h-4" /></button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex-1">
+                          <div className="font-medium text-slate-700">{t.description}</div>
+                          <div className="text-xs text-slate-400">{t.category} • {new Date(t.timestamp).toLocaleDateString()}</div>
+                        </div>
+                        <div className={`font-bold ${t.category === 'Credit' ? 'text-green-600' : 'text-slate-800'}`}>
+                          {t.category === 'Credit' ? '+' : '-'}₹{t.amount.toFixed(2)}
+                        </div>
+                        <div className="flex items-center gap-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => startEditing(t)} className="text-slate-400 hover:text-primary transition-colors p-1.5 rounded hover:bg-primary/10"><Pencil className="w-4 h-4" /></button>
+                          <button onClick={() => handleDeleteTx(t.id)} className="text-slate-400 hover:text-red-500 transition-colors p-1.5 rounded hover:bg-red-50"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
 
-        {/* Right Column: Carousel on Mobile, Stack on Desktop */}
-        <div className="lg:col-span-1">
-          {/* Mobile Carousel Wrapper */}
-          <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide gap-4 pb-4 -mx-4 px-4 lg:mx-0 lg:px-0 lg:pb-0">
-            
-            {/* Chart Card */}
-            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm min-w-[85vw] sm:min-w-[400px] lg:min-w-0 snap-center lg:mb-8 shrink-0">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">
-                <BrainCircuit className="w-5 h-5 text-primary" /> Reality Check
-              </h2>
-              
-              <div className="h-56 sm:h-64 mb-6">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
-                    <YAxis tick={{fontSize: 10}} axisLine={false} tickLine={false} />
-                    <Tooltip cursor={{fill: '#f8f9fa'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
-                    <Legend iconType="circle" wrapperStyle={{fontSize: '10px'}} />
-                    <Bar dataKey="Recommended" fill="#e2e8f0" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="Actual" fill="#0D3B66" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-            
-            {/* Recent Logs Card */}
-            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-100 shadow-sm min-w-[85vw] sm:min-w-[400px] lg:min-w-0 snap-center lg:mb-8 shrink-0 flex flex-col h-full">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-800 mb-4">Recent Logs</h2>
-              <div className="space-y-3 flex-1 overflow-y-auto max-h-[300px] scrollbar-hide">
-                {transactions.length === 0 ? (
-                  <p className="text-sm text-slate-400 italic">No entries logged yet.</p>
-                ) : (
-                  transactions.slice(0, 5).map(t => (
-                    <div key={t.id} className="flex justify-between items-center p-2 sm:p-3 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100 group">
-                      {editingId === t.id ? (
-                        <div className="flex-1 flex flex-wrap gap-2 items-center">
-                          <input type="number" value={editAmount} onChange={e => setEditAmount(e.target.value)} className="w-16 sm:w-20 px-2 py-1 border border-slate-200 rounded text-xs sm:text-sm outline-none focus:border-primary min-h-[36px]" />
-                          <select value={editCategory} onChange={e => setEditCategory(e.target.value as any)} className="w-20 sm:w-24 px-1 py-1 border border-slate-200 rounded text-xs sm:text-sm bg-white outline-none focus:border-primary min-h-[36px]">
-                            <option value="Food">Food</option>
-                            <option value="Shopping">Shopping</option>
-                            <option value="Travel">Travel</option>
-                            {hasFixed && <option value="Fixed">Fixed</option>}
-                            <option value="Other">Other</option>
-                            <option value="Credit">Credit</option>
-                          </select>
-                          <input type="text" value={editDesc} onChange={e => setEditDesc(e.target.value)} className="flex-1 min-w-[70px] px-2 py-1 border border-slate-200 rounded text-xs sm:text-sm outline-none focus:border-primary min-h-[36px]" />
-                          <div className="flex gap-1">
-                            <button onClick={() => handleUpdateTx(t.id)} className="text-green-600 hover:text-green-700 p-2 bg-green-50 rounded min-h-[36px]"><Check className="w-4 h-4" /></button>
-                            <button onClick={() => setEditingId(null)} className="text-slate-400 hover:text-slate-600 p-2 bg-slate-100 rounded min-h-[36px]"><X className="w-4 h-4" /></button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex-1 min-w-0 pr-2">
-                            <div className="font-medium text-slate-700 text-sm sm:text-base truncate">{t.description}</div>
-                            <div className="text-[10px] sm:text-xs text-slate-400 truncate">{t.category} • {new Date(t.timestamp).toLocaleDateString()}</div>
-                          </div>
-                          <div className={`font-bold text-sm sm:text-base whitespace-nowrap ${t.category === 'Credit' ? 'text-green-600' : 'text-slate-800'}`}>
-                            {t.category === 'Credit' ? '+' : '-'}₹{t.amount.toFixed(2)}
-                          </div>
-                          <div className="flex items-center gap-1 ml-2 sm:ml-4 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => startEditing(t)} className="text-slate-400 hover:text-primary transition-colors p-2 rounded hover:bg-primary/10 min-h-[36px]"><Pencil className="w-4 h-4" /></button>
-                            <button onClick={() => handleDeleteTx(t.id)} className="text-slate-400 hover:text-red-500 transition-colors p-2 rounded hover:bg-red-50 min-h-[36px]"><Trash2 className="w-4 h-4" /></button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* AI Insights Card */}
-            <div className="min-w-[85vw] sm:min-w-[400px] lg:min-w-0 snap-center shrink-0">
-              <div className={`p-4 sm:p-5 rounded-2xl ${isOverBudget ? 'bg-red-50 text-red-700 border-red-100' : 'bg-primary/5 text-primary-light border-primary/10'} border text-xs sm:text-sm leading-relaxed shadow-sm`}>
-                <div className="flex items-center justify-between font-bold mb-2">
-                  <span>AI Insight</span>
-                  <button 
-                    onClick={() => setShowFullInsight(!showFullInsight)}
-                    className="text-xs underline opacity-70 hover:opacity-100 min-h-[32px] px-2 -mr-2"
-                  >
-                    {showFullInsight ? "Show Less" : "Read More"}
-                  </button>
-                </div>
-                <div>
-                  {isOverBudget 
-                    ? "🚨 Warning: You are trending over your budget limits."
-                    : (spent.Shopping > budget.allocations.shopping) 
-                      ? "⚠️ You hit your savings, but overspent on Shopping." 
-                      : "✅ Excellent pacing. You are within AI limits."
-                  }
-                </div>
-                {showFullInsight && (
-                  <div className="mt-2 pt-2 border-t border-current/10 opacity-90">
-                    {isOverBudget 
-                      ? "You have exceeded the recommended maximums. Watch your flexible spending closely for the rest of the month to ensure you still hit your baseline savings target."
-                      : (spent.Shopping > budget.allocations.shopping) 
-                        ? "Watch out for impulse buys next month! Shifting funds from other flexible categories is covering the difference this month." 
-                        : "Your spending behavior matches the ideal allocation perfectly. Your savings target is completely secure at this pace."
-                    }
-                  </div>
-                )}
-              </div>
-            </div>
-
-          </div>
+        {/* Right Column: AI Reality Check */}
+        <div className="space-y-8">
           
-          {/* Mobile Carousel Indicators */}
-          <div className="flex lg:hidden justify-center gap-2 mt-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
+          <div className={`savings-target-card text-white p-6 rounded-2xl shadow-lg relative overflow-hidden transition-colors ${dynamicSavings < 0 ? 'bg-red-600' : 'bg-primary'}`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+            <h2 className="text-lg font-semibold mb-2 opacity-90">Savings Target</h2>
+            <div className={`text-4xl font-bold mb-1 ${dynamicSavings < 0 ? 'text-white' : 'text-secondary'}`}>
+              ₹{dynamicSavings.toFixed(2)}
+            </div>
+            <div className="text-sm text-white/80">
+              {dynamicSavings < 0 ? 'Warning: You have overspent your available funds!' : `Your initial goal was ₹${budget.allocations.savings.toFixed(2)}`}
+            </div>
           </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">
+              <BrainCircuit className="w-5 h-5 text-primary" /> End-of-Month Reality Check
+            </h2>
+            
+            <div className="h-64 mb-6">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="name" tick={{fontSize: 12}} axisLine={false} tickLine={false} />
+                  <YAxis tick={{fontSize: 12}} axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{fill: '#f8f9fa'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                  <Legend iconType="circle" wrapperStyle={{fontSize: '12px'}} />
+                  <Bar dataKey="Recommended" fill="#e2e8f0" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Actual" fill="#0D3B66" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            
+            <div className="mb-6">
+              <CategoryProgress label="Overall Budget Used" spent={effectiveTotalSpent} allocated={totalAvailable} isOverall={true} />
+            </div>
+
+            <div className={`ai-insight-card p-4 rounded-xl ${isOverBudget ? 'bg-red-50 text-red-700 border-red-100' : 'bg-primary/5 text-primary-light border-primary/10'} border text-sm leading-relaxed`}>
+              <strong>AI Insight:</strong> {
+                isOverBudget 
+                ? "You are trending over your recommended budget limits. Watch your flexible spending to ensure you hit your savings target."
+                : (spent.Shopping > budget.allocations.shopping) 
+                  ? "You hit your savings goal perfectly, but you overspent on your Shopping budget. Watch out for impulse buys next month!" 
+                  : "Excellent pacing. You are well within the AI recommended limits across all categories. Your savings target is secure."
+              }
+            </div>
+          </div>
+
         </div>
       </div>
 

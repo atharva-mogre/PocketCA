@@ -6,31 +6,23 @@ import customHeroImage from '../assets/image.png';
 const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f9fafb] to-slate-200">
-      {/* Mobile-First Header / HUD */}
-      <header className="max-w-7xl mx-auto px-6 pt-8 flex items-center justify-center md:justify-start gap-3">
-        <div className="bg-[#0f172a] p-2 rounded-xl shadow-lg">
-          <BrainCircuit className="w-8 h-8 text-[#10b981]" />
-        </div>
-        <span className="text-2xl font-black text-[#0f172a] tracking-tight">POCKET CA</span>
-      </header>
-
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-6 pt-12 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[85vh]">
+      <section className="max-w-7xl mx-auto px-6 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[85vh]">
         
         {/* Left Column (Content) */}
-        <div className="flex flex-col justify-center text-center md:text-left space-y-8">
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-[#0f172a] leading-[1.1] tracking-tighter mx-auto md:mx-0">
+        <div className="flex flex-col justify-center space-y-10">
+          <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-[#0f172a] leading-[1.1] tracking-tighter">
             Make your pocket money last until <span className="text-[#10b981]">Month End.</span>
           </h1>
           
-          <p className="text-lg sm:text-2xl text-slate-600 font-medium leading-relaxed max-w-xl mx-auto md:mx-0">
+          <p className="text-xl sm:text-2xl text-slate-600 font-medium leading-relaxed max-w-xl">
             Stop stressing about your monthly allowance. Tell our AI engine what you have and what you must spend—we handle the rest.
           </p>
           
-          <div className="flex justify-center md:justify-start">
+          <div>
             <Link
               to="/onboarding"
-              className="inline-flex items-center justify-center bg-[#0f172a] text-white min-h-[48px] px-10 py-4 rounded-full font-bold text-lg sm:text-xl transition-all duration-300 ease-in-out hover:bg-[#10b981] shadow-xl hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:scale-105"
+              className="inline-flex items-center justify-center bg-[#0f172a] text-white min-h-[48px] px-10 py-5 rounded-full font-bold text-xl transition-all duration-300 ease-in-out hover:bg-[#10b981] shadow-xl hover:shadow-[0_0_30px_rgba(16,185,129,0.4)] hover:scale-105"
             >
               Plan My Month
             </Link>
@@ -38,11 +30,11 @@ const LandingPage: React.FC = () => {
         </div>
         
         {/* Right Column (Visual Anchor) */}
-        <div className="flex items-center justify-center mt-12 md:mt-0">
+        <div className="flex items-center justify-center">
           <img
             src={customHeroImage}
             alt="PocketCA App Dashboard Logo"
-            className="w-full h-auto max-w-sm md:max-w-xl object-contain animate-[float_6s_ease-in-out_infinite]"
+            className="w-full h-auto max-w-xl object-contain animate-[float_6s_ease-in-out_infinite]"
           />
         </div>
       </section>
