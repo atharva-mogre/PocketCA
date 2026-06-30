@@ -164,14 +164,14 @@ export default function Dashboard() {
                   placeholder="Amount (₹)" 
                   value={txAmount}
                   onChange={(e) => setTxAmount(e.target.value)}
-                  className="flex-1 min-w-[120px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary min-h-[48px]"
+                  className="w-full sm:w-auto flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary min-h-[48px]"
                   required
                 />
                 {txType === 'expense' && (
                   <select 
                     value={txCategory}
                     onChange={(e) => setTxCategory(e.target.value as any)}
-                    className="flex-1 min-w-[140px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary bg-white min-h-[48px]"
+                    className="w-full sm:w-auto flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary bg-white min-h-[48px]"
                   >
                     <option value="Food">Food & Drinks</option>
                     <option value="Shopping">Shopping & Ent.</option>
@@ -185,9 +185,9 @@ export default function Dashboard() {
                   placeholder="Description (optional)" 
                   value={txDesc}
                   onChange={(e) => setTxDesc(e.target.value)}
-                  className="w-full sm:w-auto sm:flex-2 min-w-[200px] px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary min-h-[48px]"
+                  className="w-full sm:w-auto sm:flex-2 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:border-primary min-h-[48px]"
                 />
-                <button type="submit" className="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition-colors min-w-[80px] min-h-[48px]">
+                <button type="submit" className="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-medium transition-colors min-h-[48px]">
                   Add
                 </button>
               </form>
